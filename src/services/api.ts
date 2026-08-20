@@ -10,6 +10,10 @@ export class ApiError extends Error {
   }
 }
 
+interface ErrorResponse {
+  message?: string | string[];
+}
+
 function getApiUrl(): string {
   const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -39,10 +43,21 @@ export async function apiFetch<T>(
     });
 
     if (!response.ok) {
-      throw new ApiError(
-        `Request failed with status ${response.status}`,
-        response.status,
-      );
+      let message = `Request failed with status ${response.status}`;
+
+      try {
+        const errorBody = (await response.json()) as ErrorResponse;
+
+        if (Array.isArray(errorBody.message)) {
+          message = errorBody.message.join(' ');
+        } else if (errorBody.message) {
+          message = errorBody.message;
+        }
+      } catch {
+        // Keep the generic status message when the API does not return JSON.
+      }
+
+      throw new ApiError(message, response.status);
     }
 
     return (await response.json()) as T;
