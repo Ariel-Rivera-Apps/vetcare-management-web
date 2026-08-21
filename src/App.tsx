@@ -1,5 +1,6 @@
 import './App.css';
 import { HealthStatus } from './components/HealthStatus';
+import { OwnersPage } from './components/OwnersPage';
 
 function App() {
   return (
@@ -11,6 +12,7 @@ function App() {
         </div>
         <HealthStatus />
       </section>
+      <OwnersPage />
     </main>
   );
 }
